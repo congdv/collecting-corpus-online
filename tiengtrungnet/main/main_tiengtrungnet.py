@@ -53,6 +53,6 @@ if __name__ == "__main__":
 		i = i + 1;
 		print("Dang get trang %d"%i)
 		main(link)
-		f.write('\n')
+		f.write(u'\n')
 	f.close()
 
