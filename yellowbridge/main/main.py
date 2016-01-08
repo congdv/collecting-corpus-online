@@ -3,11 +3,15 @@ import urllib2
 from bs4 import BeautifulSoup
 import io
 
-
 def main(wordList):
+	i = 0
 	for word in wordList:
-                #start infor mation about a word
-                f.write(u"-----Start word------\n")
+		i = i + 1
+		print("Dang get tu thu %d"%i)
+
+		#start infor mation about a word
+    f.write(u"-----Start word------\n")
+
 		#content process
 		the_page = getResponseFromPostMethod('E', word).read()
 		soup = BeautifulSoup(the_page)
@@ -16,8 +20,10 @@ def main(wordList):
 		#find all tr tag, get text with '|' separator
 		for trtag in tabletag.find_all('tr'):
 			f.write(trtag.get_text('|') + '\n')
-                #end infomation about a word
-                f.write(u"-----End word-------\n")
+
+		#end infomation about a word
+    f.write(u"-----End word-------\n")
+
 
 def getResponseFromPostMethod(searchMode, word):
 	
@@ -25,7 +31,7 @@ def getResponseFromPostMethod(searchMode, word):
 	url = 'http://www.yellowbridge.com/chinese/dictionary.php'
 
 	# user_agent get from http://www.useragentstring.com/
-	user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:42.0) Gecko/20100101 Firefox/42.0'
+	user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
 
 	#value is param send in post method
 	# values = {'searchMode' : 'E',
