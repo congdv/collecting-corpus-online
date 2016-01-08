@@ -62,14 +62,19 @@ if __name__ == '__main__':
 
     #demo with 10 word in wordlist
     #wordList = ['hello', 'class', 'friend', 'orange', 'address', 'alone', 'answer', 'box', 'bicycle', 'field']
+    #initialize wordList variable
     wordList = []
+    #read vocabulary from file word_list_english.txt
     word_list_file = open('word_list_english.txt','r')
     for line in word_list_file:
         wordList.append(line.rstrip())
+    #close file word_list_english.txt
     word_list_file.close()
     filename = 'output.txt'
     f = io.open(filename, 'w', encoding='utf-8')
+    #collect chinese - english word
     main(wordList)
+    #close collective file
     f.close()
 
 
