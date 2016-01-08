@@ -6,7 +6,8 @@ import io
 
 def main(wordList):
 	for word in wordList:
-
+                #start infor mation about a word
+                f.write(u"-----Start word------\n")
 		#content process
 		the_page = getResponseFromPostMethod('E', word).read()
 		soup = BeautifulSoup(the_page)
@@ -15,7 +16,8 @@ def main(wordList):
 		#find all tr tag, get text with '|' separator
 		for trtag in tabletag.find_all('tr'):
 			f.write(trtag.get_text('|') + '\n')
-
+                #end infomation about a word
+                f.write(u"-----End word-------\n")
 
 def getResponseFromPostMethod(searchMode, word):
 	
