@@ -71,6 +71,8 @@ def getResponseFromPostMethod(searchMode, word):
     values = {'searchMode' : searchMode,
               'word' : word
              }
+
+    #PHPSESSID is different for each session
     cookies = 'PHPSESSID=t172g5rc4rb48p27a5okb69to5'
 
     # header of request
