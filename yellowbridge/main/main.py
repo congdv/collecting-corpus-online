@@ -7,14 +7,19 @@ import webbrowser
 import requests
 
 
-def main(wordList):
+def main(wordList, listPhpsessionid):
     i = 1
+    j = 0
+    _len = len(listPhpsessionid)
     for word in wordList:
 
         # content process
         # get content that request to website
+        
+        if j == _len:
+            return
         try:
-            the_page = getResponseFromPostMethod('E', word)
+            the_page = getResponseFromPostMethod('E', word, listPhpsessionid[j])
 
         # handle error request forbidden
         except urllib2.HTTPError as error:
@@ -26,10 +31,11 @@ def main(wordList):
 
         # get title page
         if soup.find('title').get_text() == 'YellowBridge Human User Verification':
-            webbrowser.open_new_tab(
-                'http://www.yellowbridge.com/general/captcha.php')
-            time.sleep(10)
-            the_page = getResponseFromPostMethod('E', word)
+            # webbrowser.open_new_tab(
+            #     'http://www.yellowbridge.com/general/captcha.php')
+            # time.sleep(10)
+            j = j + 1
+            the_page = getResponseFromPostMethod('E', word, listPhpsessionid[j])
             soup = BeautifulSoup(the_page.read())
 
         print word
@@ -56,7 +62,7 @@ def main(wordList):
         print i
         i = i + 1
 
-def getResponseFromPostMethod(searchMode, word):
+def getResponseFromPostMethod(searchMode, word, phpsessionid):
 	
     # destination page exploit
     url = 'http://www.yellowbridge.com/chinese/dictionary.php'
@@ -73,7 +79,7 @@ def getResponseFromPostMethod(searchMode, word):
              }
 
     #PHPSESSID is different for each session
-    cookies = 'PHPSESSID=t172g5rc4rb48p27a5okb69to5'
+    cookies = 'PHPSESSID=' + phpsessionid
 
     # header of request
     headers = { 'User-Agent' : user_agent,'Cookie':cookies}
@@ -93,6 +99,15 @@ def getResponseFromPostMethod(searchMode, word):
     
 if __name__ == '__main__':
 
+    #init phpsessinid list
+    lstPhpsessionid = []
+    for x in xrange(1,11):
+        r = requests.get('http://www.yellowbridge.com/chinese/sentsearch.php?word=%E7%94%B5%E8%84%91')
+        for c in r.cookies:
+            lstPhpsessionid.append(c.value)
+            print(c.value)
+
+
     # demo with 10 word in wordlist
     # wordList = ['hello', 'class', 'friend', 'orange', 'address', 'alone', 'answer', 'box', 'bicycle', 'field']
 
@@ -111,7 +126,7 @@ if __name__ == '__main__':
     f = io.open(filename, 'w', encoding='utf-8')
 
     # collect chinese - english word
-    main(wordList)
+    main(wordList, lstPhpsessionid)
 
     # close collective file
     f.close()
