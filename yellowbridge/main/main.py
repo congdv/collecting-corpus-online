@@ -1,81 +1,66 @@
-from sys import argv
 import urllib
 import time
 import urllib2
 from bs4 import BeautifulSoup
 import io
-import webbrowser
-import requests
+import random
+import os.path
+from sys import argv
 
-script, file_session ,file_word,file_collect = argv
+script, session_file, word_list_file, out_put_file = argv
 
-def main(wordList, listPhpsessionid):
+def main(wordList,session_list):
+
     i = 1
     j = 0
-    _len = len(listPhpsessionid)
+    _len = len(session_list)
+
+    #x init from 0
     for word in wordList:
-        
-        if j == _len:
-<<<<<<< HEAD
-           return
-=======
-            return
+        print i
+        # delays for 5 seconds
+        # time.sleep(5)
 
         # content process
-        # get content that request to website
->>>>>>> 2d3396a23279d05032e6a7ae616f083587419919
+
+        # get random user agent string in list
+        # userAgentString = random.choice(User_agent_List)
+        print session_list[j]
         try:
-            print 'session %d'%j
-            the_page = getResponseFromPostMethod('E', word, listPhpsessionid[j])
+            the_page = getResponseFromPostMethod('E', word, session_list[j])
+        except:
+            print 'Error request'
 
-        # handle error request forbidden
-        except urllib2.HTTPError as error:
-            print error
-            return None
-
-        # use lib for parse html struct
+        #parse html structure
         soup = BeautifulSoup(the_page.read())
-
-        # if server require verification
+        print 'Session %d'%j
         if soup.find('title').get_text() == 'YellowBridge Human User Verification':
-
-            # webbrowser.open_new_tab(
-            #     'http://www.yellowbridge.com/general/captcha.php')
-            # time.sleep(10)
-            
             j = j + 1
             if j == _len:
                 j = 0
-            the_page = getResponseFromPostMethod('E', word, listPhpsessionid[j])
+            the_page = getResponseFromPostMethod('E',word,session_list[j])
             soup = BeautifulSoup(the_page.read())
-
+            print 'False'
         print word
-
+        # find all tr tag, get text with '|' separator
         try:
-		    tabletag = soup.find('table', {'id': 'multiRow'})
+            tabletag = soup.find('table', {'id': 'multiRow'})
+            if(tabletag != None):
+                for trtag in tabletag.find_all('tr'):
+                    f.write(trtag.get_text('|')+ u'\n')
+                print 'OK'
+            else:
+                print 'Not Found ' + word 
 
-		    # if tabletag existed
-		    if tabletag != None:
-
-			    # start infor mation about a word
-		        f.write(u"-----Start word: %s -----\n"%word)
-		        f.write
-
-                # find all tr tag, get text with '|' separator
-	            for trtag in tabletag.find_all('tr'):
-		       		f.write(trtag.get_text('|') + u'\n')
-
-		        # end infomation about a word
-        	    f.write(u"-----End word-------\n")
         except AttributeError as error:
-            print "not found html tag"
-            
-        
-        print i
+            print 'Not Found ' + error 
         i = i + 1
+        if i == 10:
+            break
 
-def getResponseFromPostMethod(searchMode, word, phpsessionid):
-	
+
+def getResponseFromPostMethod(searchMode, word, session_id):
+
     # destination page exploit
     url = 'http://www.yellowbridge.com/chinese/dictionary.php'
 
@@ -86,72 +71,55 @@ def getResponseFromPostMethod(searchMode, word, phpsessionid):
     # values = {'searchMode' : 'E',
     #           'word' : 'hello'
     #          }
-    values = {'searchMode' : searchMode,
-              'word' : word
-             }
-
-    #PHPSESSID is different for each session
-    cookies = 'PHPSESSID=' + phpsessionid
-
+    values = {'searchMode': searchMode,
+              'word': word
+              }
+    #cookie for request
+    cookie = 'PHPSESSID=' + session_id
     # header of request
-    headers = { 'User-Agent' : user_agent,'Cookie':cookies}
-
+    headers = {'User-Agent': user_agent, 'Cookie':cookie}
     # encode url(values)
     data = urllib.urlencode(values)
-
     # create request
     req = urllib2.Request(url, data, headers)
-
     # get response
     response = urllib2.urlopen(req)
-        
     return response
 
-def collect_session():
-    f = open('session.txt','w')
-    #init phpsessinid list
-    lstPhpsessionid = []
-<<<<<<< HEAD
-    for x in xrange(1,1930):
-        r = requests.get('http://www.yellowbridge.com/chinese/sentsearch.php?word=%E7%94%B5%E8%84%91')
-=======
-    for x in xrange(1,1800):
-    # for x in xrange(1,10):
-        r = requests.get('http://www.yellowbridge.com')
->>>>>>> 2d3396a23279d05032e6a7ae616f083587419919
-        for c in r.cookies:
-            f.write(str(r.cookies))
-            f.write('\n')
-            print(c.value)
-    f.close()
-    
+
 if __name__ == '__main__':
 
-   
     # demo with 10 word in wordlist
     # wordList = ['hello', 'class', 'friend', 'orange', 'address', 'alone', 'answer', 'box', 'bicycle', 'field']
-    #collect phpsessionid
-    lstPhpsessionid = []
-    session_file = open(file_session,'r')
-    for line in session_file:
-        lstPhpsessionid.append(line.rstrip('\n'))
-    session_file.close()
+    
+    #initialize session list variable
+    session_list = []
+    #read session collection
+    sessions = open(session_file,'r')
+    for session in sessions:
+        session_list.append(session.rstrip('\n'))
+
     # initialize wordList variable
     wordList = []
 
     # read vocabulary from file word_list_english.txt
-    word_list_file = open(file_word,'r')
+    word_list_file = open(word_list_file, 'r')
     for line in word_list_file:
         wordList.append(line.rstrip())
 
     # close file word_list_english.txt
     word_list_file.close()
 
-    #filename = 'output.txt'
-    f = io.open(file_collect, 'w', encoding='utf-8')
+    filename = out_put_file
+
+    #check filename is existed
+    if os.path.isfile(filename):
+        f = io.open(filename, 'a', encoding='utf-8')
+    else:
+        f = io.open(filename, 'w', encoding='utf-8')
 
     # collect chinese - english word
-    main(wordList, lstPhpsessionid)
+    main(wordList,session_list)
 
     # close collective file
     f.close()
