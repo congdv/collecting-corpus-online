@@ -1,3 +1,4 @@
+from sys import argv
 import urllib
 import time
 import urllib2
@@ -6,6 +7,7 @@ import io
 import webbrowser
 import requests
 
+script, file_session ,file_word,file_collect = argv
 
 def main(wordList, listPhpsessionid):
     i = 1
@@ -17,8 +19,9 @@ def main(wordList, listPhpsessionid):
         # get content that request to website
         
         if j == _len:
-            return
+           return
         try:
+            print 'session %d'%j
             the_page = getResponseFromPostMethod('E', word, listPhpsessionid[j])
 
         # handle error request forbidden
@@ -35,6 +38,8 @@ def main(wordList, listPhpsessionid):
             #     'http://www.yellowbridge.com/general/captcha.php')
             # time.sleep(10)
             j = j + 1
+            if j == _len:
+                j = 0
             the_page = getResponseFromPostMethod('E', word, listPhpsessionid[j])
             soup = BeautifulSoup(the_page.read())
 
@@ -51,12 +56,12 @@ def main(wordList, listPhpsessionid):
 
                 # find all tr tag, get text with '|' separator
 	            for trtag in tabletag.find_all('tr'):
-		       		f.write(trtag.get_text('|') + '\n')
+		       		f.write(trtag.get_text('|') + u'\n')
 
 		        # end infomation about a word
         	    f.write(u"-----End word-------\n")
         except AttributeError as error:
-            print "not found html tag because forbidden"
+            print "not found html tag"
             
         
         print i
@@ -95,35 +100,42 @@ def getResponseFromPostMethod(searchMode, word, phpsessionid):
         
     return response
 
-
+def collect_session():
+    f = open('session.txt','w')
+    #init phpsessinid list
+    lstPhpsessionid = []
+    for x in xrange(1,1930):
+        r = requests.get('http://www.yellowbridge.com/chinese/sentsearch.php?word=%E7%94%B5%E8%84%91')
+        for c in r.cookies:
+            f.write(str(r.cookies))
+            f.write('\n')
+            print(c.value)
+    f.close()
     
 if __name__ == '__main__':
 
-    #init phpsessinid list
-    lstPhpsessionid = []
-    for x in xrange(1,11):
-        r = requests.get('http://www.yellowbridge.com/chinese/sentsearch.php?word=%E7%94%B5%E8%84%91')
-        for c in r.cookies:
-            lstPhpsessionid.append(c.value)
-            print(c.value)
-
-
+   
     # demo with 10 word in wordlist
     # wordList = ['hello', 'class', 'friend', 'orange', 'address', 'alone', 'answer', 'box', 'bicycle', 'field']
-
+    #collect phpsessionid
+    lstPhpsessionid = []
+    session_file = open(file_session,'r')
+    for line in session_file:
+        lstPhpsessionid.append(line.rstrip('\n'))
+    session_file.close()
     # initialize wordList variable
     wordList = []
 
     # read vocabulary from file word_list_english.txt
-    word_list_file = open('word_list_english.txt','r')
+    word_list_file = open(file_word,'r')
     for line in word_list_file:
         wordList.append(line.rstrip())
 
     # close file word_list_english.txt
     word_list_file.close()
 
-    filename = 'output.txt'
-    f = io.open(filename, 'w', encoding='utf-8')
+    #filename = 'output.txt'
+    f = io.open(file_collect, 'w', encoding='utf-8')
 
     # collect chinese - english word
     main(wordList, lstPhpsessionid)
