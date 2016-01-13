@@ -14,12 +14,16 @@ def main(wordList, listPhpsessionid):
     j = 0
     _len = len(listPhpsessionid)
     for word in wordList:
+        
+        if j == _len:
+<<<<<<< HEAD
+           return
+=======
+            return
 
         # content process
         # get content that request to website
-        
-        if j == _len:
-           return
+>>>>>>> 2d3396a23279d05032e6a7ae616f083587419919
         try:
             print 'session %d'%j
             the_page = getResponseFromPostMethod('E', word, listPhpsessionid[j])
@@ -32,11 +36,13 @@ def main(wordList, listPhpsessionid):
         # use lib for parse html struct
         soup = BeautifulSoup(the_page.read())
 
-        # get title page
+        # if server require verification
         if soup.find('title').get_text() == 'YellowBridge Human User Verification':
+
             # webbrowser.open_new_tab(
             #     'http://www.yellowbridge.com/general/captcha.php')
             # time.sleep(10)
+            
             j = j + 1
             if j == _len:
                 j = 0
@@ -52,7 +58,8 @@ def main(wordList, listPhpsessionid):
 		    if tabletag != None:
 
 			    # start infor mation about a word
-		        f.write(u"-----Start word------\n")
+		        f.write(u"-----Start word: %s -----\n"%word)
+		        f.write
 
                 # find all tr tag, get text with '|' separator
 	            for trtag in tabletag.find_all('tr'):
@@ -104,8 +111,14 @@ def collect_session():
     f = open('session.txt','w')
     #init phpsessinid list
     lstPhpsessionid = []
+<<<<<<< HEAD
     for x in xrange(1,1930):
         r = requests.get('http://www.yellowbridge.com/chinese/sentsearch.php?word=%E7%94%B5%E8%84%91')
+=======
+    for x in xrange(1,1800):
+    # for x in xrange(1,10):
+        r = requests.get('http://www.yellowbridge.com')
+>>>>>>> 2d3396a23279d05032e6a7ae616f083587419919
         for c in r.cookies:
             f.write(str(r.cookies))
             f.write('\n')
