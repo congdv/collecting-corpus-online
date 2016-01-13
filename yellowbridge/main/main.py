@@ -54,7 +54,7 @@ def main(wordList, listPhpsessionid):
 
                 # find all tr tag, get text with '|' separator
 	            for trtag in tabletag.find_all('tr'):
-		       		f.write(trtag.get_text('|') + '\n')
+		       		f.write(trtag.get_text('|') + u'\n')
 
 		        # end infomation about a word
         	    f.write(u"-----End word-------\n")
